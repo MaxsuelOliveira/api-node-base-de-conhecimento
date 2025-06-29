@@ -1,0 +1,29 @@
+{
+  "name": "base_de_conhecimento",
+  "version": "1.0.0",
+  "description": "",
+  "main": "app.js",
+  "scripts": {
+    "dev": "node index.js",
+    "seed": "node prisma/seed.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "dependencies": {
+    "@prisma/client": "^6.10.1",
+    "bcryptjs": "^3.0.2",
+    "cors": "^2.8.5",
+    "dotenv": "^16.5.0",
+    "express": "^5.1.0",
+    "express-validator": "^7.2.1",
+    "fast-jwt": "^6.0.2",
+    "jose": "^6.0.11",
+    "morgan": "^1.10.0",
+    "multer": "^2.0.1",
+    "prisma": "^6.10.1",
+    "sqlite3": "^5.1.7"
+  }
+}
