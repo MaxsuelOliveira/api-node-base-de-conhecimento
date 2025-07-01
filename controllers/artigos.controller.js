@@ -2,7 +2,6 @@ const { PrismaClient } = require("@prisma/client");
 const prisma = new PrismaClient();
 
 const Artigos = {
-  
   create: async (data, callback) => {
     try {
       console.log("Dados recebidos para criação do artigo:", data);
@@ -89,10 +88,76 @@ const Artigos = {
     }
   },
 
+  getBySetor: async (setor_id, callback) => {
+    try {
+      // Verificar se o setor existe
+      const setor = await prisma.setor.findUnique({
+        where: { id: setor_id },
+      });
+      if (!setor) {
+        return callback(new Error("Setor não encontrado."));
+      }
+
+      // Buscar artigos pelo setor
+      const artigos = await prisma.artigos.findMany({
+        where: { setor_id },
+        include: {
+          setor: true,
+          categoria: true,
+          autor: true,
+        },
+      });
+
+      if (artigos.length === 0) return callback(null, []);
+      const artigosFormatados = artigos.map((a) => ({
+        ...a,
+        setor_nome: a.setor?.nome,
+        categoria_nome: a.categoria?.nome,
+        autor_nome: a.autor?.nome,
+      }));
+      callback(null, artigosFormatados);
+    } catch (error) {
+      callback(error);
+    }
+  },
+
+  getByCategoria: async (categoria_id, callback) => {
+    try {
+      // Verificar se a categoria existe
+      const categoria = await prisma.categorias.findUnique({
+        where: { id: categoria_id },
+      });
+      if (!categoria) {
+        return callback(new Error("Categoria não encontrada."));
+      }
+
+      // Buscar artigos pela categoria
+      const artigos = await prisma.artigos.findMany({
+        where: { categoria_id },
+        include: {
+          setor: true,
+          categoria: true,
+          autor: true,
+        },
+      });
+
+      if (artigos.length === 0) return callback(null, []);
+      const artigosFormatados = artigos.map((a) => ({
+        ...a,
+        setor_nome: a.setor?.nome,
+        categoria_nome: a.categoria?.nome,
+        autor_nome: a.autor?.nome,
+      }));
+      callback(null, artigosFormatados);
+    } catch (error) {
+      callback(error);
+    }
+  },
+
   getById: async (id, callback) => {
     try {
       const artigo = await prisma.artigos.findUnique({
-        where: { id },
+        where: { id : Number(id)},
         include: {
           setor: true,
           categoria: true,
@@ -118,9 +183,69 @@ const Artigos = {
   delete: async (id, callback) => {
     try {
       await prisma.artigos.delete({
-        where: { id },
+        where: { id : Number(id)},
       });
       callback(null);
+    } catch (error) {
+      callback(error);
+    }
+  },
+
+  update: async (id, data, callback) => {
+
+    try {
+      const {
+        slug,
+        titulo,
+        setor_id,
+        categoria_id,
+        descricao,
+        anexo,
+        link,
+        conteudo_html,
+        publico,
+      } = data;
+
+      // Verificar se o artigo existe
+      const artigoExistente = await prisma.artigos.findUnique({
+        where: { id : Number(id)},
+      });
+      if (!artigoExistente) {
+        return callback(new Error("Artigo não encontrado."));
+      }
+
+      // Verificar se a categoria e setor existem
+      const setor = await prisma.setor.findUnique({
+        where: { id: Number(setor_id) },
+      });
+      if (!setor) {
+        return callback(new Error("Setor não encontrado."));
+      }
+
+      const categoria = await prisma.categorias.findUnique({
+        where: { id: Number(categoria_id) },
+      });
+      if (!categoria) {
+        return callback(new Error("Categorias não encontrada."));
+      }
+
+      const artigoAtualizado = await prisma.artigos.update({
+        where: { id : Number(id)},
+        data: {
+          slug: slug || titulo.toLowerCase().replace(/\s+/g, "-"),
+          titulo,
+          setor_id: Number(setor_id),
+          categoria_id: Number(categoria_id),
+          descricao,
+          anexo,
+          link,
+          conteudo_html: conteudo_html,
+          date_updated: new Date(),
+          publico: publico ?? true,
+        },
+      });
+
+      callback(null, artigoAtualizado);
     } catch (error) {
       callback(error);
     }

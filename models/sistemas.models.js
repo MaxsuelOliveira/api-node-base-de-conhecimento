@@ -1,7 +1,12 @@
 const Sistemas = require("../controllers/sistemas.controller");
 
 exports.create = (req, res) => {
-  Sistemas.create(req.body.nome, (err) => {
+  const { nome } = req.body;
+  if (!nome) {
+    return res.status(400).send({ error: "Nome do sistema é obrigatório" });
+  }
+
+  Sistemas.create(nome, (err) => {
     if (err) return res.status(500).send(err.message);
     res.status(201).send({ message: "Sistema criado" });
   });

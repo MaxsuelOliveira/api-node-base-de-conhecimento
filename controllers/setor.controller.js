@@ -26,7 +26,7 @@ const Setor = {
   delete: async (id, callback) => {
     try {
       await prisma.setor.delete({
-        where: { id },
+        where: { id : Number(id)},
       });
       callback(null);
     } catch (err) {

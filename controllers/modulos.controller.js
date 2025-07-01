@@ -25,7 +25,7 @@ const Modulos = {
   update: async (id, data, callback) => {
     try {
       const modulo = await prisma.modulos.update({
-        where: { id },
+        where: { id : Number(id)},
         data: {
           slug: data.slug,
           titulo: data.titulo,
@@ -54,7 +54,7 @@ const Modulos = {
   getById: async (id, callback) => {
     try {
       const modulo = await prisma.modulos.findUnique({
-        where: { id },
+        where: { id : Number(id)},
         include: {
           conteudos: {
             orderBy: { ordem: "asc" },
@@ -102,7 +102,7 @@ const modulo_conteudo = {
   update: async (id, data, callback) => {
     try {
       const conteudo = await prisma.modulo_conteudo.update({
-        where: { id },
+        where: { id : Number(id)},
         data: {
           ordem: data.ordem,
           titulo_custom: data.titulo_custom,

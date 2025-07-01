@@ -1,7 +1,10 @@
 const express = require("express");
 const router = express.Router();
 const { auth, is_admin } = require("../middlewares/auth");
-const { Usuarios, usuario_modulo } = require("../controllers/usuarios.controller");
+const {
+  Usuarios,
+  usuario_modulo,
+} = require("../controllers/usuarios.controller");
 
 router.get("/", auth, is_admin, (req, res) => {
   Usuarios.getAll((err, usuarios) => {
@@ -10,8 +13,32 @@ router.get("/", auth, is_admin, (req, res) => {
   });
 });
 
-router.post("/", auth, is_admin, (req, res) => {
+router.post("/admin", auth, is_admin, (req, res) => {
   Usuarios.create(req.body, (err, usuario) => {
+    if (err) return res.status(500).json({ error: err.message });
+    res.status(201).json(usuario);
+  });
+});
+
+router.post("/", (req, res) => {
+  const { nome, email, senha, admin = false } = req.body;
+
+  // Bloqueia tentativa de criar usuário admin diretamente
+  if (admin === true) {
+    return res
+      .status(403)
+      .json({ error: "Não é permitido criar usuários administradores." });
+  }
+
+  // Verificar se o email já está cadastrado
+  Usuarios.findByEmail(email, (err, usuarioExistente) => {
+    if (err) return res.status(500).json({ error: err.message });
+    if (usuarioExistente) {
+      return res.status(400).json({ error: "Email já cadastrado." });
+    }
+  });
+
+  Usuarios.create({ nome, email, senha, admin: false }, (err, usuario) => {
     if (err) return res.status(500).json({ error: err.message });
     res.status(201).json(usuario);
   });

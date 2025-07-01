@@ -15,7 +15,7 @@ const Recompensa = {
   update: async (id, data, callback) => {
     try {
       const recompensa = await prisma.recompensa.update({
-        where: { id },
+        where: { id : Number(id)},
         data,
       });
       callback(null, recompensa);
@@ -73,7 +73,7 @@ const UsuarioRecompensa = {
   update: async (id, data, callback) => {
     try {
       const atualizado = await prisma.usuarioRecompensa.update({
-        where: { id },
+        where: { id : Number(id)},
         data,
       });
       callback(null, atualizado);

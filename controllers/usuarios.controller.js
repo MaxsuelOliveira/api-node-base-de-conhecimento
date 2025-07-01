@@ -23,7 +23,7 @@ const Usuarios = {
   getById: async (id, callback) => {
     try {
       const usuario = await prisma.usuarios.findUnique({
-        where: { id },
+        where: { id : Number(id)},
         select: {
           id: true,
           nome: true,
@@ -51,12 +51,12 @@ const Usuarios = {
 
       // Retorna apenas os dados do usuário, sem token
       callback(null, {
-        id: usuario.id,
-        nome: usuario.nome,
-        email: usuario.email,
-        is_admin: usuario.is_admin,
-        permissao: usuario.permissao,
-        token: generateToken(usuario), // Aqui você pode gerar um token JWT se necessário
+        user: {
+          nome: usuario.nome,
+          email: usuario.email,
+          is_admin: usuario.is_admin,
+        },
+        token: generateToken(usuario),
       });
     } catch (err) {
       callback(err);
@@ -111,7 +111,7 @@ const Usuarios = {
       }
 
       const usuario = await prisma.usuarios.update({
-        where: { id },
+        where: { id : Number(id)},
         data: {
           nome: data.nome,
           email: data.email,
@@ -119,6 +119,17 @@ const Usuarios = {
         },
       });
       callback(null, usuario);
+    } catch (err) {
+      callback(err);
+    }
+  },
+
+  findByEmail: async (email, callback) => {
+    try {
+      const usuario = await prisma.usuarios.findUnique({
+        where: { email },
+      });
+      callback(null, !!usuario); // Retorna true se o usuário existir, false caso contrário
     } catch (err) {
       callback(err);
     }
@@ -148,7 +159,7 @@ const usuario_modulo = {
   updateStatus: async (id, data, callback) => {
     try {
       const atualizado = await prisma.usuario_modulo.update({
-        where: { id },
+        where: { id : Number(id)},
         data: {
           concluido: data.concluido,
           obrigatorio: data.obrigatorio,

@@ -10,6 +10,7 @@ const artigoRoutes = require("./routes/artigos.route");
 const modulosRoutes = require("./routes/modulos.route");
 const usuariosRoutes = require("./routes/usuarios.route");
 const recompensasRoutes = require("./routes/recompensas.route");
+// const sistemasRoutes = require("./routes/sistemas.route");
 
 const app = express();
 
@@ -25,13 +26,14 @@ app.use(
   })
 );
 
-app.use("/api/login", loginRoutes); // Rota de login
+app.use("/api/login", loginRoutes);
 app.use("/api/setores", setorRoutes);
 app.use("/api/categorias", categoriaRoutes);
 app.use("/api/artigos", artigoRoutes);
 app.use("/api/modulos", modulosRoutes);
 app.use("/api/usuarios", usuariosRoutes);
-app.use("api/recompensas", recompensasRoutes);
+app.use("/api/recompensas", recompensasRoutes);
+// app.use("/api/sistemas", sistemasRoutes);
 
 app.use((req, res, next) => {
   res.status(404).json({ error: "Endpoint não encontrado" });

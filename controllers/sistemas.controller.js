@@ -16,7 +16,7 @@ const Sistemas = {
   getById: async (id, callback) => {
     try {
       const sistema = await prisma.sistema.findUnique({
-        where: { id },
+        where: { id : Number(id)},
         include: {
           modulos: {
             orderBy: { ordem: "asc" },
@@ -55,7 +55,7 @@ const Sistemas = {
   update: async (id, data, callback) => {
     try {
       const sistema = await prisma.sistema.update({
-        where: { id },
+        where: { id : Number(id)},
         data: {
           nome: data.nome,
           descricao: data.descricao,

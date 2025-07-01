@@ -63,7 +63,7 @@ const Categorias = {
   delete: async (id, callback) => {
     try {
       await prisma.categorias.delete({
-        where: { id },
+        where: { id : Number(id)},
       });
       callback(null);
     } catch (err) {
