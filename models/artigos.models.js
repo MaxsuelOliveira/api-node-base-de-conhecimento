@@ -14,7 +14,7 @@ exports.create = (req, res) => {
   } = req.body;
 
   if (
-    !!slug ||
+    !slug ||
     !titulo ||
     !setor_id ||
     !categoria_id ||
@@ -109,9 +109,6 @@ exports.delete = (req, res) => {
 };
 
 exports.update = (req, res) => {
-  console.log("Atualizando artigo com ID:", req.params.id);
-  console.log("Dados recebidos:", req.body);
-
   const { id } = req.params;
   if (!id) {
     return res.status(400).send({ error: "ID do artigo não fornecido" });
@@ -128,10 +125,26 @@ exports.update = (req, res) => {
     publico,
   } = req.body;
 
-  if (!titulo || !setor_id || !categoria_id || !descricao || !anexo || !link) {
+  if (!titulo) {
     return res
       .status(400)
       .send({ error: "Campos obrigatórios não preenchidos" });
+  }
+
+  if (!setor_id) {
+    return res.status(400).send({ error: "Setor ID não fornecido" });
+  }
+
+  if (!categoria_id) {
+    return res.status(400).send({ error: "Categoria ID não fornecido" });
+  }
+
+  if (!descricao) {
+    return res.status(400).send({ error: "Descrição não fornecida" });
+  }
+
+  if (!link) {
+    return res.status(400).send({ error: "Link não fornecido" });
   }
 
   Artigos.update(id, req.body, (err) => {

@@ -136,12 +136,12 @@ const Usuarios = {
   },
 };
 
-const usuario_modulo = {
+const UsuarioModulo = {
   // Atribuir módulo para usuário
   assignModulo: async (data, callback) => {
     // data: { usuario_id, modulo_id, obrigatorio (bool) }
     try {
-      const atribuido = await prisma.usuario_modulo.create({
+      const atribuido = await prisma.UsuarioModulo.create({
         data: {
           usuario_id: data.usuario_id,
           modulo_id: data.modulo_id,
@@ -158,7 +158,7 @@ const usuario_modulo = {
   // Atualizar status concluído e/ou obrigatorio
   updateStatus: async (id, data, callback) => {
     try {
-      const atualizado = await prisma.usuario_modulo.update({
+      const atualizado = await prisma.UsuarioModulo.update({
         where: { id : Number(id)},
         data: {
           concluido: data.concluido,
@@ -207,7 +207,7 @@ const usuario_modulo = {
   // Listar módulos de um usuário (com status)
   getModulosByUsuario: async (usuario_id, callback) => {
     try {
-      const modulos = await prisma.usuario_modulo.findMany({
+      const modulos = await prisma.UsuarioModulo.findMany({
         where: { usuario_id },
         include: {
           modulo: true,
@@ -225,7 +225,7 @@ const usuario_modulo = {
   // Remover módulo atribuído ao usuário
   removeModulo: async (id, callback) => {
     try {
-      await prisma.usuario_modulo.delete({ where: { id } });
+      await prisma.UsuarioModulo.delete({ where: { id } });
       callback(null);
     } catch (err) {
       callback(err);
@@ -233,4 +233,4 @@ const usuario_modulo = {
   },
 };
 
-module.exports = { Usuarios, usuario_modulo };
+module.exports = { Usuarios, UsuarioModulo };

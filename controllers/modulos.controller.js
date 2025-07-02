@@ -4,7 +4,7 @@ const prisma = new PrismaClient();
 const Modulos = {
   create: async (data, callback) => {
     try {
-      const modulo = await prisma.modulos.create({
+      const modulo = await prisma.modulo.create({
         data: {
           slug: data.slug,
           titulo: data.titulo,
@@ -24,7 +24,7 @@ const Modulos = {
 
   update: async (id, data, callback) => {
     try {
-      const modulo = await prisma.modulos.update({
+      const modulo = await prisma.modulo.update({
         where: { id : Number(id)},
         data: {
           slug: data.slug,
@@ -42,7 +42,7 @@ const Modulos = {
 
   getAll: async (callback) => {
     try {
-      const modulos = await prisma.modulos.findMany({
+      const modulos = await prisma.modulo.findMany({
         orderBy: { ordem: "asc" },
       });
       callback(null, modulos);
@@ -53,7 +53,7 @@ const Modulos = {
 
   getById: async (id, callback) => {
     try {
-      const modulo = await prisma.modulos.findUnique({
+      const modulo = await prisma.modulo.findUnique({
         where: { id : Number(id)},
         include: {
           conteudos: {
@@ -70,7 +70,7 @@ const Modulos = {
 
   delete: async (id, callback) => {
     try {
-      await prisma.modulos.delete({ where: { id } });
+      await prisma.modulo.delete({ where: { id } });
       callback(null);
     } catch (err) {
       callback(err);
@@ -78,12 +78,12 @@ const Modulos = {
   },
 };
 
-const modulo_conteudo = {
+const ModuloConteudo = {
   create: async (data, callback) => {
     try {
       const { titulo, descricao, ordem, modulo_id, artigo_id, video } = data;
 
-      const conteudo = await prisma.modulo_conteudo.create({
+      const conteudo = await prisma.moduloConteudo.create({
         data: {
           modulo_id: modulo_id,
           artigo_id: artigo_id || null,
@@ -101,7 +101,7 @@ const modulo_conteudo = {
 
   update: async (id, data, callback) => {
     try {
-      const conteudo = await prisma.modulo_conteudo.update({
+      const conteudo = await prisma.moduloConteudo.update({
         where: { id : Number(id)},
         data: {
           ordem: data.ordem,
@@ -118,7 +118,7 @@ const modulo_conteudo = {
 
   delete: async (id, callback) => {
     try {
-      await prisma.modulo_conteudo.delete({ where: { id } });
+      await prisma.moduloConteudo.delete({ where: { id } });
       callback(null);
     } catch (err) {
       callback(err);
@@ -127,7 +127,7 @@ const modulo_conteudo = {
 
   getAll: async (callback) => {
     try {
-      const conteudos = await prisma.modulo_conteudo.findMany({
+      const conteudos = await prisma.moduloConteudo.findMany({
         orderBy: { ordem: "asc" },
         include: { artigo: true },
       });
@@ -139,7 +139,7 @@ const modulo_conteudo = {
 
   getBymodulo_id: async (modulo_id, callback) => {
     try {
-      const conteudos = await prisma.modulo_conteudo.findMany({
+      const conteudos = await prisma.moduloConteudo.findMany({
         where: { modulo_id },
         orderBy: { ordem: "asc" },
         include: { artigo: true },
@@ -151,4 +151,4 @@ const modulo_conteudo = {
   },
 };
 
-module.exports = { Modulos, modulo_conteudo };
+module.exports = { Modulos, ModuloConteudo };

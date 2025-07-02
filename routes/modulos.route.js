@@ -3,12 +3,11 @@ const router = express.Router();
 const { auth, is_admin } = require("../middlewares/auth");
 const {
   Modulos,
-  modulo_conteudo,
+  ModuloConteudo,
 } = require("../controllers/modulos.controller");
 
 router.post("/", auth, is_admin, (req, res) => {
-  console.log("Dados recebidos:", req.user.id, req.body);
-
+  
   const data = {
     ...req.body,
     autor_id: req.user.id, // pega o ID do usuário logado via JWT
@@ -47,7 +46,7 @@ router.get("/:id", (req, res) => {
 
 router.get("/:modulo_id/conteudos", (req, res) => {
   const modulo_id = parseInt(req.params.modulo_id);
-  modulo_conteudo.getBymodulo_id(modulo_id, (err, conteudos) => {
+  ModuloConteudo.getBymodulo_id(modulo_id, (err, conteudos) => {
     if (err) return res.status(500).json({ error: err.message });
     res.json(conteudos);
   });
@@ -64,7 +63,7 @@ router.delete("/:id", auth, is_admin, (req, res) => {
 router.post("/:modulo_id/conteudos", auth, is_admin, (req, res) => {
   const modulo_id = parseInt(req.params.modulo_id);
   const data = { ...req.body, modulo_id };
-  modulo_conteudo.create(data, (err, conteudo) => {
+  ModuloConteudo.create(data, (err, conteudo) => {
     if (err) return res.status(500).json({ error: err.message });
     res.status(201).json(conteudo);
   });
@@ -72,7 +71,7 @@ router.post("/:modulo_id/conteudos", auth, is_admin, (req, res) => {
 
 router.put("/conteudos/:id", auth, is_admin, (req, res) => {
   const id = parseInt(req.params.id);
-  modulo_conteudo.update(id, req.body, (err, conteudo) => {
+  ModuloConteudo.update(id, req.body, (err, conteudo) => {
     if (err) return res.status(500).json({ error: err.message });
     res.json(conteudo);
   });
@@ -80,7 +79,7 @@ router.put("/conteudos/:id", auth, is_admin, (req, res) => {
 
 router.delete("/conteudos/:id", auth, is_admin, (req, res) => {
   const id = parseInt(req.params.id);
-  modulo_conteudo.delete(id, (err) => {
+  ModuloConteudo.delete(id, (err) => {
     if (err) return res.status(500).json({ error: err.message });
     res.json({ message: "Conteúdo deletado com sucesso" });
   });

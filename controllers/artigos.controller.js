@@ -4,8 +4,6 @@ const prisma = new PrismaClient();
 const Artigos = {
   create: async (data, callback) => {
     try {
-      console.log("Dados recebidos para criação do artigo:", data);
-
       const {
         slug,
         titulo,
@@ -35,7 +33,8 @@ const Artigos = {
       if (!setor) {
         return callback(new Error("Setor não encontrado."));
       }
-      const categoria = await prisma.categorias.findUnique({
+
+      const categoria = await prisma.categoria.findUnique({
         where: { id: categoria_id },
       });
       if (!categoria) {
@@ -124,7 +123,7 @@ const Artigos = {
   getByCategoria: async (categoria_id, callback) => {
     try {
       // Verificar se a categoria existe
-      const categoria = await prisma.categorias.findUnique({
+      const categoria = await prisma.categoria.findUnique({
         where: { id: categoria_id },
       });
       if (!categoria) {
@@ -157,7 +156,7 @@ const Artigos = {
   getById: async (id, callback) => {
     try {
       const artigo = await prisma.artigos.findUnique({
-        where: { id : Number(id)},
+        where: { id: Number(id) },
         include: {
           setor: true,
           categoria: true,
@@ -183,7 +182,7 @@ const Artigos = {
   delete: async (id, callback) => {
     try {
       await prisma.artigos.delete({
-        where: { id : Number(id)},
+        where: { id: Number(id) },
       });
       callback(null);
     } catch (error) {
@@ -192,10 +191,11 @@ const Artigos = {
   },
 
   update: async (id, data, callback) => {
+    // Não atualizar o slug se não for fornecido
+    const slug = data.slug || undefined;
 
     try {
       const {
-        slug,
         titulo,
         setor_id,
         categoria_id,
@@ -208,7 +208,7 @@ const Artigos = {
 
       // Verificar se o artigo existe
       const artigoExistente = await prisma.artigos.findUnique({
-        where: { id : Number(id)},
+        where: { id: Number(id) },
       });
       if (!artigoExistente) {
         return callback(new Error("Artigo não encontrado."));
@@ -222,7 +222,7 @@ const Artigos = {
         return callback(new Error("Setor não encontrado."));
       }
 
-      const categoria = await prisma.categorias.findUnique({
+      const categoria = await prisma.categoria.findUnique({
         where: { id: Number(categoria_id) },
       });
       if (!categoria) {
@@ -230,18 +230,28 @@ const Artigos = {
       }
 
       const artigoAtualizado = await prisma.artigos.update({
-        where: { id : Number(id)},
+        where: { id: Number(id) },
         data: {
-          slug: slug || titulo.toLowerCase().replace(/\s+/g, "-"),
+          slug: slug || artigoExistente.slug,
           titulo,
-          setor_id: Number(setor_id),
-          categoria_id: Number(categoria_id),
           descricao,
           anexo,
           link,
-          conteudo_html: conteudo_html,
+          conteudo_html,
           date_updated: new Date(),
           publico: publico ?? true,
+
+          // Relacionamentos
+          setor: setor_id
+            ? {
+                connect: { id: Number(setor_id) },
+              }
+            : undefined,
+          categoria: categoria_id
+            ? {
+                connect: { id: Number(categoria_id) },
+              }
+            : undefined,
         },
       });
 

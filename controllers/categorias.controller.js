@@ -2,7 +2,7 @@ const { PrismaClient } = require("@prisma/client");
 const prisma = new PrismaClient();
 
 const Categorias = {
-    create: async (nome, setor_id, callback) => {
+  create: async (nome, setor_id, callback) => {
     try {
       // Verifica se o setor existe
       const setorExiste = await prisma.setor.findUnique({
@@ -14,7 +14,7 @@ const Categorias = {
       }
 
       // Cria a categoria com setor_id válido
-      const novaCategoria = await prisma.categorias.create({
+      const novaCategoria = await prisma.categoria.create({
         data: {
           nome,
           setor_id
@@ -29,7 +29,7 @@ const Categorias = {
 
   getAll: async (callback) => {
     try {
-      const categorias = await prisma.categorias.findMany({
+      const categorias = await prisma.categoria.findMany({
         include: {
           setor: {
             select: { nome: true },
@@ -51,7 +51,7 @@ const Categorias = {
 
   getBySetor: async (setor_id, callback) => {
     try {
-      const categorias = await prisma.categorias.findMany({
+      const categorias = await prisma.categoria.findMany({
         where: { setor_id },
       });
       callback(null, categorias);
@@ -62,8 +62,8 @@ const Categorias = {
 
   delete: async (id, callback) => {
     try {
-      await prisma.categorias.delete({
-        where: { id : Number(id)},
+      await prisma.categoria.delete({
+        where: { id: Number(id) },
       });
       callback(null);
     } catch (err) {

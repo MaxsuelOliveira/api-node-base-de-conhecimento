@@ -10,16 +10,17 @@ datasource db {
 model Setor {
   id         Int          @id @default(autoincrement())
   nome       String
-  categorias Categorias[]
+  categorias Categoria[]
   artigos    Artigos[]
 }
 
-model Categorias {
-  id       Int       @id @default(autoincrement())
-  nome     String
-  setor_id Int
-  setor    Setor     @relation(fields: [setor_id], references: [id], onDelete: Cascade)
-  artigos  Artigos[]
+model Categoria {
+  id        Int       @id @default(autoincrement())
+  nome      String
+  setor_id  Int
+  setor     Setor     @relation(fields: [setor_id], references: [id], onDelete: Cascade)
+  artigos   Artigos[]
+  sistemas  Sistemas[]
 }
 
 model Usuarios {
@@ -31,37 +32,45 @@ model Usuarios {
   criado_em          DateTime            @default(now())
   atualizado_em      DateTime            @updatedAt
 
-  artigos_criados    Artigos[]           @relation("ArtigosDoUsuario")
-  modulos_criados    Modulos[]           @relation("ModulosDoUsuario")
-  modulos_atribuidos usuario_modulo[]
+  artigos_criados    Artigos[]            @relation("ArtigosDoUsuario")
+  modulos_criados    Modulo[]            @relation("ModulosDoUsuario")
+  modulos_atribuidos UsuarioModulo[]
   recompensas        UsuarioRecompensa[]
   avaliacoes         Avaliacao[]
   videos_assistidos  VideoAssistido[]
 }
 
 model Artigos {
-  id              Int               @id @default(autoincrement())
-  slug            String            @unique
-  titulo          String?
-  descricao       String?
-  conteudo_html   String?
-  link            String?
-  anexo           String?
-  date_created    DateTime
-  setor_id        Int?
-  setor           Setor?            @relation(fields: [setor_id], references: [id])
-  categoria_id    Int?
-  categoria       Categorias?       @relation(fields: [categoria_id], references: [id])
-  autor_id        Int
-  autor           Usuarios          @relation(name: "ArtigosDoUsuario", fields: [autor_id], references: [id])
-  modulo_conteudo modulo_conteudo[]
-  publico         Boolean
+  id             Int       @id @default(autoincrement())
+  slug           String    @unique
+  titulo         String?
+  descricao      String?
+  conteudo_html  String?
+  link           String?
+  anexo          String?
+  date_created   DateTime
+  date_updated   DateTime?
+  setor_id       Int?
+  setor          Setor?     @relation(fields: [setor_id], references: [id])
+  categoria_id   Int?
+  categoria      Categoria? @relation(fields: [categoria_id], references: [id])
+  autor_id       Int
+  autor          Usuarios   @relation(name: "ArtigosDoUsuario", fields: [autor_id], references: [id])
+  ModuloConteudo ModuloConteudo[]
+  publico        Boolean
 
-  avaliacoes      Avaliacao[]
-  views           ViewCount[]
+  avaliacoes     Avaliacao[]
+  views          ViewCount[]
 }
 
-model Modulos {
+model Sistemas {
+  id            Int       @id @default(autoincrement())
+  titulo        String
+  categoria_id  Int
+  categoria     Categoria  @relation(fields: [categoria_id], references: [id])
+}
+
+model Modulo {
   id              Int               @id @default(autoincrement())
   slug            String            @unique
   titulo          String
@@ -71,18 +80,18 @@ model Modulos {
   publico         Boolean
   autor_id        Int
   autor           Usuarios          @relation(name: "ModulosDoUsuario", fields: [autor_id], references: [id])
-  conteudos       modulo_conteudo[]
-  usuario_modulo  usuario_modulo[]
+  conteudos       ModuloConteudo[]
+  UsuarioModulo  UsuarioModulo[]
   avaliacoes      Avaliacao[]
   views           ViewCount[]
 }
 
-model modulo_conteudo {
+model ModuloConteudo {
   id                Int               @id @default(autoincrement())
   modulo_id         Int
-  modulo            Modulos           @relation(fields: [modulo_id], references: [id], onDelete: Cascade)
+  modulo            Modulo            @relation(fields: [modulo_id], references: [id], onDelete: Cascade)
   artigo_id         Int?
-  artigo            Artigos?          @relation(fields: [artigo_id], references: [id], onDelete: Cascade)
+  artigo            Artigos?           @relation(fields: [artigo_id], references: [id], onDelete: Cascade)
   ordem             Int               @default(0)
   titulo_custom     String?
   descricao_custom  String?
@@ -93,12 +102,12 @@ model modulo_conteudo {
   assistidos        VideoAssistido[]
 }
 
-model usuario_modulo {
+model UsuarioModulo {
   id              Int       @id @default(autoincrement())
   usuario_id      Int
   usuario         Usuarios  @relation(fields: [usuario_id], references: [id], onDelete: Cascade)
   modulo_id       Int
-  modulo          Modulos   @relation(fields: [modulo_id], references: [id], onDelete: Cascade)
+  modulo          Modulo    @relation(fields: [modulo_id], references: [id], onDelete: Cascade)
   concluido       Boolean   @default(false)
   obrigatorio     Boolean   @default(false)
   atribuido_em    DateTime  @default(now())
@@ -134,11 +143,11 @@ model Avaliacao {
   usuario_id     Int
   usuario        Usuarios          @relation(fields: [usuario_id], references: [id], onDelete: Cascade)
   artigo_id      Int?
-  artigo         Artigos?          @relation(fields: [artigo_id], references: [id], onDelete: Cascade)
+  artigo         Artigos?           @relation(fields: [artigo_id], references: [id], onDelete: Cascade)
   modulo_id      Int?
-  modulo         Modulos?          @relation(fields: [modulo_id], references: [id], onDelete: Cascade)
+  modulo         Modulo?           @relation(fields: [modulo_id], references: [id], onDelete: Cascade)
   conteudo_id    Int?
-  conteudo       modulo_conteudo?  @relation(fields: [conteudo_id], references: [id], onDelete: Cascade)
+  conteudo       ModuloConteudo?  @relation(fields: [conteudo_id], references: [id], onDelete: Cascade)
   nota           Int
   comentario     String?
   criado_em      DateTime          @default(now())
@@ -150,7 +159,7 @@ model VideoAssistido {
   usuario_id    Int
   usuario       Usuarios         @relation(fields: [usuario_id], references: [id], onDelete: Cascade)
   conteudo_id   Int
-  conteudo      modulo_conteudo  @relation(fields: [conteudo_id], references: [id], onDelete: Cascade)
+  conteudo      ModuloConteudo  @relation(fields: [conteudo_id], references: [id], onDelete: Cascade)
   visto_em      DateTime         @default(now())
 
   @@unique([usuario_id, conteudo_id])
@@ -159,10 +168,10 @@ model VideoAssistido {
 model ViewCount {
   id            Int               @id @default(autoincrement())
   artigo_id     Int?
-  artigo        Artigos?          @relation(fields: [artigo_id], references: [id], onDelete: Cascade)
+  artigo        Artigos?           @relation(fields: [artigo_id], references: [id], onDelete: Cascade)
   modulo_id     Int?
-  modulo        Modulos?          @relation(fields: [modulo_id], references: [id], onDelete: Cascade)
+  modulo        Modulo?           @relation(fields: [modulo_id], references: [id], onDelete: Cascade)
   conteudo_id   Int?
-  conteudo      modulo_conteudo?  @relation(fields: [conteudo_id], references: [id], onDelete: Cascade)
+  conteudo      ModuloConteudo?  @relation(fields: [conteudo_id], references: [id], onDelete: Cascade)
   total_views   Int               @default(0)
 }
